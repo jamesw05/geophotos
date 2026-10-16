@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Cairn Cartographics
 """Map tool that identifies clicked photo point(s) and previews the image(s).
 
 Several photos are often taken at the same location, so their points stack on
@@ -15,12 +17,19 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsProject,
     QgsWkbTypes,
+    QgsMessageLog,
+    Qgis,
 )
 from qgis.gui import QgsMapTool
 
 # Custom layer property used to tag layers created / recognised by this plugin.
 PHOTO_LAYER_PROPERTY = "geophotos/photo_layer"
 PATH_FIELD = "path"
+
+
+def _log(exc):
+    """Log a non-fatal exception to the QGIS message log (GeoPhotos tab)."""
+    QgsMessageLog.logMessage(str(exc), "GeoPhotos", Qgis.Warning)
 
 
 class PhotoIdentifyTool(QgsMapTool):
@@ -44,7 +53,8 @@ class PhotoIdentifyTool(QgsMapTool):
                     layers.append(lyr)
                 elif lyr.fields().indexFromName(PATH_FIELD) != -1:
                     layers.append(lyr)
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
         return layers
 
@@ -127,8 +137,8 @@ class PhotoIdentifyTool(QgsMapTool):
             try:
                 lyr.removeSelection()
                 lyr.selectByIds(ids)
-            except Exception:
-                pass
+            except Exception as _exc:
+                _log(_exc)
 
         if paths:
             self._callback(paths)

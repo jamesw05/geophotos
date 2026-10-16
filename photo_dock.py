@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Cairn Cartographics
 """Docked photo preview pane.
 
 Shows a single image scaled to fill the dock at 100% (largest size that fits
@@ -10,7 +12,7 @@ an "Open externally" action.
 
 import os
 import sys
-import subprocess
+import subprocess  # nosec B404 (only used to open a validated local file, no shell)
 
 from qgis.PyQt.QtCore import Qt, QUrl, QTimer, QRect, QRectF, QPoint, QSize
 from qgis.PyQt.QtGui import QPixmap, QImageReader, QTransform, QDesktopServices
@@ -394,13 +396,18 @@ class PhotoDock(QDockWidget):
         QTimer.singleShot(60, lambda: self._launch(path))
 
     def _launch(self, path):
+        # `path` is a validated, existing local file (checked in _open_external),
+        # opened in the OS default viewer. No shell is used and arguments are a
+        # fixed list, so there is no shell-injection surface.
+        if not path or not os.path.exists(path):
+            return
         try:
             if sys.platform == "darwin":
                 # -a Preview activates the app and brings its window to front.
-                subprocess.Popen(["/usr/bin/open", "-a", "Preview", path])
+                subprocess.Popen(["/usr/bin/open", "-a", "Preview", path])  # nosec B603
             elif os.name == "nt":
-                os.startfile(path)  # noqa: S606 (Windows only)
+                os.startfile(path)  # noqa: S606  # nosec B606 (Windows only)
             else:
                 QDesktopServices.openUrl(QUrl.fromLocalFile(path))
-        except Exception:
+        except OSError:
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))

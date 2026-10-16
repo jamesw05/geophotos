@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Cairn Cartographics
 """Dependency-free EXIF GPS reader.
 
 Parses the EXIF/TIFF metadata block of JPEG and TIFF images to extract GPS
@@ -20,6 +22,11 @@ Returns None if the file has no usable GPS fix or cannot be parsed.
 """
 
 import struct
+
+# Narrow set of errors that EXIF parsing may legitimately raise on malformed
+# input. Catching these (rather than a broad Exception) keeps the parser robust
+# without masking unrelated bugs.
+_PARSE_ERRORS = (ValueError, TypeError, IndexError, KeyError, AttributeError, struct.error)
 
 # ---------------------------------------------------------------------------
 # TIFF field types -> (size in bytes, struct code for a single element)
@@ -188,7 +195,7 @@ def read_orientation(path):
             val = int(val)
             if 1 <= val <= 8:
                 return val
-    except Exception:
+    except _PARSE_ERRORS:
         pass
     return 1
 
@@ -227,7 +234,7 @@ def read_gps(path):
                 if isinstance(dt, str) and len(dt) >= 19:
                     # EXIF format 'YYYY:MM:DD HH:MM:SS' -> 'YYYY-MM-DD HH:MM:SS'
                     result["datetime"] = dt[:10].replace(":", "-") + dt[10:]
-        except Exception:
+        except _PARSE_ERRORS:
             pass
 
     # GPS IFD (tag 0x8825)
@@ -261,13 +268,13 @@ def read_gps(path):
             if parsed.get("alt_ref") in (1, b"\x01"):
                 alt = -alt
             result["altitude"] = alt
-        except Exception:
+        except _PARSE_ERRORS:
             pass
 
     if "direction" in parsed:
         try:
             result["direction"] = float(parsed["direction"])
-        except Exception:
+        except _PARSE_ERRORS:
             pass
 
     # Only meaningful if we actually got a coordinate

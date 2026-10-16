@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Cairn Cartographics
 """GeoPhotos — main plugin class.
 
 Adds a toolbar with:
@@ -30,6 +32,7 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsProperty,
     QgsEditorWidgetSetup,
+    QgsMessageLog,
     Qgis,
 )
 
@@ -37,6 +40,12 @@ from .exif_reader import read_gps
 from .load_dialog import GeoPhotosDialog
 from .photo_dock import PhotoDock
 from .photo_maptool import PhotoIdentifyTool, PHOTO_LAYER_PROPERTY
+
+
+def _log(exc):
+    """Log a non-fatal exception to the QGIS message log (GeoPhotos tab)."""
+    QgsMessageLog.logMessage(str(exc), "GeoPhotos", Qgis.Warning)
+
 
 SETTINGS_THUMBS = "geophotos/thumbnails_enabled"
 SETTINGS_ROWHEIGHT = "geophotos/row_height"
@@ -162,7 +171,8 @@ class GeoPhotosPlugin:
             try:
                 if lyr.customProperty(PROP_FOLDER):
                     return True
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
         return False
 
@@ -172,7 +182,8 @@ class GeoPhotosPlugin:
             try:
                 if lyr.customProperty(PHOTO_LAYER_PROPERTY) or lyr.customProperty(PROP_FOLDER):
                     out.append(lyr)
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
         return out
 
@@ -206,7 +217,8 @@ class GeoPhotosPlugin:
                     p = feat[idx]
                     if p:
                         paths.append(p)
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
         return paths
 
@@ -279,8 +291,8 @@ class GeoPhotosPlugin:
                 layer.setSubsetString(expr)
             else:
                 layer.setSubsetString("")
-        except Exception:
-            pass
+        except Exception as _exc:
+            _log(_exc)
 
     def _apply_thumbnail_widget(self, layer):
         """Configure the 'path' field as an image attachment (thumbnails) or plain text."""
@@ -301,8 +313,8 @@ class GeoPhotosPlugin:
             else:
                 setup = QgsEditorWidgetSetup("TextEdit", {})
             layer.setEditorWidgetSetup(idx, setup)
-        except Exception:
-            pass
+        except Exception as _exc:
+            _log(_exc)
 
     # ----------------------------------------------------------------- load
     def _do_load(self, v):
@@ -344,8 +356,8 @@ class GeoPhotosPlugin:
         try:
             self.canvas.setExtent(layer.extent())
             self.canvas.refresh()
-        except Exception:
-            pass
+        except Exception as _exc:
+            _log(_exc)
 
         # Auto-enable the identify tool and dock.
         self.identify_action.setChecked(True)
@@ -447,7 +459,8 @@ class GeoPhotosPlugin:
             try:
                 if lyr.customProperty(PROP_FOLDER):
                     return lyr
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
         return None
 
@@ -468,8 +481,8 @@ class GeoPhotosPlugin:
         try:
             layer.setRenderer(QgsSingleSymbolRenderer(self._build_marker_symbol()))
             layer.triggerRepaint()
-        except Exception:
-            pass
+        except Exception as _exc:
+            _log(_exc)
 
     # --------------------------------------------------------------- helpers
     def _scan_files(self, folder, recursive):
@@ -565,7 +578,8 @@ class GeoPhotosPlugin:
         for lid, lyr in QgsProject.instance().mapLayers().items():
             try:
                 src = lyr.source()
-            except Exception:
+            except Exception as _exc:
+                _log(_exc)
                 continue
             if gpkg_path in src and token in src:
                 ids.append(lid)
