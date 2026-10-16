@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- black direction triangle underneath the camera (points "down" at 0deg;
+       rotated by the photo azimuth on the map) -->
+  <path d="M22 38 L42 38 L32 62 Z" fill="#000000"/>
+  <!-- camera (red), no background -->
+  <rect x="12" y="16" width="40" height="24" rx="4" fill="#c62828" stroke="#8e0000" stroke-width="1.5"/>
+  <rect x="24" y="10" width="14" height="7" rx="2" fill="#c62828" stroke="#8e0000" stroke-width="1"/>
+  <circle cx="32" cy="28" r="9" fill="#ffffff" stroke="#8e0000" stroke-width="1.5"/>
+  <circle cx="32" cy="28" r="5" fill="#ef9a9a"/>
+  <circle cx="45" cy="21" r="2.5" fill="#fff59d"/>
+</svg>

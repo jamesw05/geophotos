@@ -1,0 +1,16 @@
+[general]
+name=GeoPhotos
+qgisMinimumVersion=3.22
+description=Load geotagged photos onto the map, save them as a GeoPackage of points, and preview each photo in a docked pane when clicked.
+about=GeoPhotos scans a folder (optionally including subfolders) for geotagged JPEG/TIFF images, reads their EXIF GPS coordinates using a bundled dependency-free reader, and creates a point layer saved to a GeoPackage (.gpkg). Click any point on the map to view the corresponding photo in a fixed dock that fills the pane at 100%.
+version=1.13.1
+author=Cairn Cartographics
+email=info@cairncarto.com
+tracker=https://github.com/jamesw05/geophotos/issues
+repository=https://github.com/jamesw05/geophotos.git
+tags=photo,exif,gps,geotag,geopackage,points,camera
+category=Plugins
+icon=icon_settings.svg
+experimental=False
+deprecated=False
+hasProcessingProvider=False
