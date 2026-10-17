@@ -6,6 +6,8 @@ Clicking on a photo shows the photo in a docked pane. If there are multiple over
 Built for **QGIS 3.x** (PyQt5). No third-party Python packages are required —
 EXIF GPS and orientation are read by a bundled, dependency-free parser.
 
+📖 **[Pretty usage documentation](https://downfallnotes.com/docs/geo/geophotos/)**
+
 ## Toolbar
 
 The plugin adds a **GeoPhotos** toolbar with two buttons:
